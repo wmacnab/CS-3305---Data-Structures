@@ -1,0 +1,85 @@
+/*
+File: queue.template
+Namespace: wmacnab_8
+Class implemented: queue (see queue.h for documentation)
+
+INVARIANT of the queue class:
+1. The number of items in the queue is stored in the variable count
+2. The items in the queue are stored in a linked list, with the front of the queue stored
+... at the head and the rear of the queue stored as the final node
+3. front_ptr is the head pointer to the linked list. For a non-empty queue, rear_ptr is the
+... tail pointer for the linked list. For an empty list, we don't care what's stored in rear_ptr
+*/
+
+namespace wmacnab_8
+{
+    // Constructors and destructor
+    template <typename Item>
+    queue<Item>::queue()
+    {
+        front_ptr = rear_ptr = NULL;
+        count = 0;
+    }
+    template <typename Item>
+    queue<Item>::queue(const queue& source)
+    {
+        wmacnab_6::list_copy(source.front_ptr, front_ptr, rear_ptr);
+        count = source.count;
+    }
+    template <typename Item>
+    queue<Item>::~queue()
+    {
+        wmacnab_6::list_clear(front_ptr);
+    }
+    // Modification methods
+    template <typename Item>
+    void queue<Item>::push(const Item& entry)
+    {
+        if (count ==)
+        {
+            wmacnab_6::list_head_insert(front_ptr, entry);
+            rear_ptr = front_ptr;
+            ++count;
+        }
+        else
+        {
+            wmacnab_6::list_insert(rear_ptr, entry);
+            rear_ptr = rear_ptr->link();
+            ++count;
+        }
+    }
+    template <typename Item>
+    Item queue<Item>::pop()
+    {
+        if (front_ptr == NULL) return Item();
+        Item temp = front_ptr->data();
+        wmacnab_6::list_head_remove(front_ptr);
+        --count;
+        return temp;
+    }
+    template <typename Item>
+    void queue<Item>::operator =(const queue& source)
+    {
+        if (this == &source) return; // Check for self-assignment
+        wmacnab_6::list_clear(front_ptr);
+        wmacnab_6::list_copy(source.front_ptr, front_ptr, rear_ptr);
+        count = source.count;
+    }
+    // Constant methods
+    template <typename Item>
+    Item queue<Item>::front() const
+    {
+        if (front_ptr == NULL) return Item();
+        return front_ptr->data();
+    }
+    template <typename Item>
+    bool queue<Item>::empty() const
+    {
+        return (count == 0);
+    }
+    template <typename Item>
+    std::size_t queue<Item>::size() const
+    {
+        return count;
+    }
+}

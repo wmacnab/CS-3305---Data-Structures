@@ -1,0 +1,91 @@
+// FILE: multiset.template
+// CLASS IMPLEMENTED: multiset
+// NAMESPACE: wmacnab_6
+/*
+INVARIANT of the multiset class:
+1. The elements of the multiset are stored in a linked list. The head of
+the linked list is pointed to by the member variable head_ptr.
+2. The number of elements in the multiset at any time is stored in the
+member variable used.
+*/
+
+#include "multiset.h"
+#include "node.h"
+
+namespace wmacnab_6
+{
+    // CONSTRUCTORS AND DESTRUCTOR
+    template <typename Item>
+    multiset<Item>::multiset()
+    {
+        head_ptr = NULL;
+        many_nodes = 0;
+    }
+    template <typename Item>
+    multiset<Item>::multiset(const multiset& source)
+    {
+        node<Item>* tail_ptr;
+        list_copy(source.head_ptr, head_ptr, tail_ptr);
+        many_nodes = source.many_nodes;
+    }
+    template <typename Item>
+    multiset<Item>::~multiset()
+    {
+        list_clear(head_ptr);
+    }
+    // MODIFICATION METHODS
+    template <typename Item>
+    void multiset<Item>::operator =(const multiset& source)
+    {
+        if (this == &source) return; // Self-assignment?
+        list_clear(head_ptr);
+        node<Item> *tail_ptr;
+        list_copy(source.head_ptr, head_ptr, tail_ptr);
+    }
+    template <typename Item>
+    void multiset<Item>::operator +=(const multiset& addend)
+    {
+        multiset<Item>::const_iterator p = addend.begin();
+        for (p = addend.begin(); p != addend.end(); ++p)
+        {
+            list_head_insert(head_ptr, *p);
+        }
+    }
+    template <typename Item>
+    void multiset<Item>::insert(const Item& entry)
+    {
+        list_head_insert(head_ptr, entry);
+    }
+    template <typename Item>
+    bool multiset<Item>::erase_one(const Item& target)
+    {
+        node<Item> *delete_ptr;
+        delete_ptr = list_search(head_ptr, target);
+        if (delete_ptr == NULL) return false;
+        else
+        {
+            delete_ptr->set_data(head_ptr->data());
+            list_head_remove(head_ptr);
+        }
+        return true;
+    }
+    template <typename Item>
+    typename multiset<Item>::size_type multiset<Item>::erase(const Item& target)
+    {
+        size_type count = 0;
+        while (list_search(head_ptr, target) != NULL)
+        {
+            erase_one(target);
+            ++count;
+        }
+        return count;
+    }
+    template <typename Item>
+    multiset<Item> operator +(const multiset<Item>& m1, const multiset<Item>& m2)
+    {
+        multiset<Item> sum;
+        sum += m1;
+        sum += m2;
+        return sum;
+    }
+}

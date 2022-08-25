@@ -1,0 +1,198 @@
+/*
+File: multiset.template
+Class implemented: multiset (see multiset.h for documentation)
+Namespace: wmacnab_10
+
+Invariant for the multiset class:
+1. The items in the multiset are stored in a binary search tree
+2. The root pointer of the binary search tree is stored in ...
+... the member variable root_ptr (which may be NULL for an empty tree).
+*/
+
+namespace wmacnab_10
+{
+    // Auxiliary functions
+    template <typename Item>
+    bool bst_remove(binary_tree_node<Item>*& root_ptr, const Item& target)
+    // Precondition: root_ptr is root of a BST or NULL for the empty tree
+    // Postcondition: If the target was in the tree, it was removed and root_ptr
+    // now points to the new smaller tree, and the return value is true.
+    // Otherwise, root_ptr is unchanged and the return value is false.
+    {
+        if (root_ptr == NULL) return false;
+        else if (target < root_ptr->data()) return bst_remove(root_ptr->left(), target);
+        else if (target > root_ptr->data()) return bst_remove(root_ptr->right(), target);
+        else if (target == root_ptr->data())
+        {
+            // Case a: no left children
+            if (root_ptr->left() == NULL)
+            {
+                binary_tree_node<Item>* delete_ptr = root_ptr;
+                root_ptr = root_ptr->left();
+                delete delete_ptr;
+                return true;
+            }
+            // Case b: are left children
+            else
+            {
+                bst_remove_max(root_ptr->left(), root_ptr->data());
+                return true;
+            }
+        }
+        return false;
+    }
+    template <typename Item>
+    void bst_remove_max(binary_tree_node<Item>*& root_ptr, Item& removed)
+    // Precondition: root_ptr is pointer of non-empty BST
+    // Postcondition: largest item in BST has been removed and root_ptr now points
+    // to the new (smaller) BST. The reference parameter, removed, has been set to
+    // a copy of the removed item
+    {
+        if (root_ptr != NULL)
+        {
+            if (root_ptr->right() != NULL) bst_remove_max(root_ptr->right(), removed);
+            else
+            {
+                binary_tree_node<Item>* delete_ptr = root_ptr;
+                removed = root_ptr->data();
+                root_ptr = root_ptr->left();
+                delete delete_ptr;
+            }
+        }
+    }
+    // Helper methods
+    template <typename Item>
+    void multiset<Item>::insert_all(const binary_tree_node<Item>* addroot_ptr)
+    // Precondition: addroot_ptr is the root pointer of a BST that is separate from
+    // the BST activating the method.
+    // Postcondition: All the items from the addroot_ptr's BST have been added to the
+    // BST of the multiset that activated the method.
+    {
+        if (addroot_ptr != NULL)
+        {
+            insert(addroot_ptr->data());
+            insert_all(addroot_ptr->left());
+            insert_all(addroot_ptr->right());
+        }
+    }
+    // Constructors and destructor
+    template <typename Item>
+    multiset<Item>::multiset()
+    {
+        root_ptr = NULL;
+    }
+    template <typename Item>
+    multiset<Item>::multiset(const multiset& source)
+    {
+        root_ptr = tree_copy(source.root_ptr);
+    }
+    template <typename Item>
+    multiset<Item>::~multiset()
+    {
+        tree_clear(root_ptr);
+    }
+    // Modification methods
+    template <typename Item>
+    void multiset<Item>::operator =(const multiset& source)
+    {
+        if (this == &source) return;
+        tree_clear(root_ptr);
+        root_ptr = tree_copy(source.root_ptr);
+    }
+    template <typename Item>
+    void multiset<Item>::operator +=(const multiset& addend)
+    {
+        if (this == &addend)
+        {
+            binary_tree_node<Item>* addroot_ptr;
+            addroot_ptr = tree_copy(root_ptr);
+            insert_all(addroot_ptr);
+            tree_clear(addroot_ptr);
+        }
+        else
+        {
+            insert_all(addend.root_ptr);
+        }
+    }
+    template <typename Item>
+    void multiset<Item>::insert(const Item& entry)
+    {
+        if (root_ptr == NULL) root_ptr = new binary_tree_node<Item>(entry);
+        else
+        {
+            binary_tree_node<Item>* cursor = root_ptr;
+            while (cursor != NULL)
+            {
+                if (entry <= cursor->data())
+                {
+                    if (cursor->left() == NULL)
+                    {
+                        cursor->left() = new binary_tree_node<Item>(entry);
+                        break;
+                    }
+                    else cursor = cursor->left();
+                }
+                else if (entry > cursor->data())
+                {
+                    if (cursor->right() == NULL)
+                    {
+                        cursor->right() = new binary_tree_node<Item>(entry);
+                        break;
+                    }
+                    else cursor = cursor->right();;
+                }
+            }
+        }
+    }
+    template <typename Item>
+    bool multiset<Item>::erase_one(const Item& target)
+    {
+        return bst_remove(root_ptr, target);
+    }
+    template <typename Item>
+    typename multiset<Item>::size_type multiset<Item>::erase(const Item& target)
+    {
+        size_type answer = 0;
+        while (erase_one(target)) ++answer;
+        return answer;
+    }
+    // Constant methods
+    template <typename Item>
+    typename multiset<Item>::size_type multiset<Item>::size() const
+    {
+        return tree_size(root_ptr);
+    }
+    template <typename Item>
+    typename multiset<Item>::size_type multiset<Item>::count(const Item& target) const
+    {
+        binary_tree_node<Item>* cursor = root_ptr;
+        size_type answer = 0;
+        while (cursor != NULL)
+        {
+            // cursor smaller
+            if (target > cursor->data()) cursor = cursor->right();
+            // cursor bigger
+            else if (target < cursor->data()) cursor = cursor->left();
+            // we found it
+            else if (target == cursor->data())
+            {
+                ++answer;
+                cursor = cursor->left();
+            }
+        }
+        return answer;
+    }
+    template <typename Item>
+    void multiset<Item>::print() const
+    {
+        tree_print(root_ptr, 0);
+    }
+    // Functions
+    template <typename Item>
+    multiset<Item> operator +(const multiset<Item>& m1, const multiset<Item>& m2)
+    {
+        multiset<Item> sum = m1;
+        sum += m2;
+        return sum;
+    }
+}

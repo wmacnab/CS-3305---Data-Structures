@@ -1,0 +1,94 @@
+// File: double_link_node.template
+// Class implemented: double_link_node
+// Namespace: wmacnab_6_9
+// Description: A double_link_node object is a node in a doubly linked list
+// INVARIANT of the double_link_node class:
+// 1. data_value
+// 2. fore_link
+// 3. back_link
+//#include <cstdlib>
+namespace wmacnab_6_9
+{
+    // Doubly Linked List Toolkit:
+    // list_insert(node* current_ptr, Item entry)
+    // Precondition: current_ptr is a node in a linked list
+    // Postcondition: insert entry as a new node after the current node
+    // list_head_insert(node*& head_ptr, Item entry)
+    // Precondition: head_ptr is the head node of a linked list
+    // Postcondition: the entry is inserted at the head
+    // list_remove(node* current_ptr)
+    // Precondition: current_ptr points to a node in a linked list
+    // Postcondition: the node is removed from the linked list
+    // list_head_remove(node* head_ptr)
+    // Precondition: head_ptr is removed from the linked list
+    // list_length(node* any_ptr)
+    // Postcondition: the number of nodes in the list is returned
+    // list_copy(node* source_ptr, node* head_ptr)
+    // Precondition: source_ptr is the head node of a linked list
+    // Postcondition: head_ptr is a new separate linked list with the same nodes as source_ptr
+
+    template <typename Item>
+    void list_insert(double_link_node<Item>* previous_ptr, const Item& entry)
+    {
+        double_link_node<Item>* insert_ptr = new double_link_node<Item>(entry, previous_ptr->fore(), previous_ptr);
+        previous_ptr->set_fore(insert_ptr);
+    }
+    template <typename Item>
+    void list_head_insert(double_link_node<Item>*& head_ptr, const Item& entry)
+    {
+        double_link_node<Item> *new_head_ptr = new double_link_node<Item>(entry, head_ptr);
+        if (head_ptr != NULL) head_ptr->set_back(new_head_ptr);
+        head_ptr = new_head_ptr;
+    }
+    template <typename Item>
+    void list_remove(double_link_node<Item>* current_ptr)
+    {
+        if (current_ptr->back() != NULL) current_ptr->back()->set_fore(current_ptr->fore());
+        if (current_ptr->fore() != NULL) current_ptr->fore()->set_back(current_ptr->back());
+        delete current_ptr;
+    }
+    template <typename Item>
+    void list_head_remove(double_link_node<Item>*& head_ptr)
+    {
+        double_link_node<Item> *delete_ptr = head_ptr;
+        if (head_ptr->fore() != NULL) head_ptr->fore()->set_back(NULL);
+        head_ptr = head_ptr->fore();
+        delete delete_ptr;
+    }
+    template <typename Item>
+    size_t list_length(const double_link_node<Item>* any_ptr)
+    {
+        if (any_ptr == NULL) return 0;
+        size_t i = 0;
+        const double_link_node<Item> *cursor;
+        // Count the node current_ptr points to and the nodes foreward of current_ptr
+        for (cursor = any_ptr; cursor != NULL; cursor = cursor->fore())++i;
+        // Count the nodes behind current_ptr
+        if (any_ptr->back() != NULL)
+        {
+            for (cursor = any_ptr->back(); cursor != NULL; cursor = cursor->back()) ++i;
+        }
+        return i;
+    }
+    // locate(), clear(), copy(), search()
+    template <typename Item>
+    void list_clear(double_link_node<Item>*& any_ptr)
+    {
+        if (any_ptr == NULL) return;
+        while (any_ptr->back() != NULL) any_ptr = any_ptr->back();
+        while (any_ptr != NULL) list_head_remove(any_ptr);
+    }
+    template <typename Item>
+    void list_copy(double_link_node<Item>* source_ptr, double_link_node<Item>*& head_ptr)
+    {
+        if (source_ptr == NULL) return;
+        list_head_insert(head_ptr, source_ptr->data());
+        double_link_node<Item> *cursor = head_ptr;
+        while (source_ptr->fore() != NULL)
+        {
+            source_ptr = source_ptr->fore();
+            list_insert(cursor, source_ptr->data());
+            cursor = cursor->fore();
+        }
+    }
+}

@@ -1,0 +1,120 @@
+/*
+File: deque.template
+Namespace: wmacnab_8
+Class implemented: deque (see deque.h for documentation)
+
+Invariant for the deque class:
+1. the number of items in the deque is stored in the variable count
+2. the items are stored in a linked list, with the head being the front and
+... the tail being the back
+3. the head of the linked list is pointed to by the variable front_ptr and the
+... tail of the linked list is pointed to by the variable back_ptr
+*/
+
+namespace wmacnab_8
+{
+    // Constructors and destructor
+    template <typename Item>
+    deque<Item>::deque()
+    {
+        front_ptr = back_ptr = NULL;
+        count = 0;
+    }
+    template <typename Item>
+    deque<Item>::deque(const deque& source)
+    {
+        wmacnab_6::list_copy(source.front_ptr, front_ptr, back_ptr);
+        count = source.count;
+    }
+    template <typename Item>
+    deque<Item>::~deque()
+    {
+        wmacnab_6::list_clear(front_ptr);
+    }
+    // Modification methods
+    template <typename Item>
+    void deque<Item>::push_front(const Item& entry)
+    {
+        wmacnab_6::list_head_insert(front_ptr, entry);
+        if (size() > 1 && front_ptr == back_ptr) back_ptr = back_ptr->link();
+        ++count;
+    }
+    template <typename Item>
+    Item deque<Item>::pop_front()
+    {
+        if (empty()) return Item();
+        Item temp = front_ptr->data();
+        wmacnab_6::list_head_remove(front_ptr);
+        --count;
+        return temp;
+    }
+    template <typename Item>
+    void deque<Item>::push_back(const Item& entry)
+    {
+        if (empty())
+        {
+            wmacnab_6::list_head_insert(front_ptr, entry);
+            ++count;
+            back_ptr = front_ptr;
+        }
+        else
+        {
+            wmacnab_6::list_insert(back_ptr, entry);
+            ++count;
+            back_ptr = back_ptr->link();
+        }
+    }
+    template <typename Item>
+    Item deque<Item>::pop_back()
+    {
+        if (empty()) return Item();
+        else if (size() == 1)
+        {
+            list_head_remove(front_ptr);
+            front_ptr = back_ptr = NULL;
+            --count;
+        }
+        else
+        {
+            //wmacnab_6::node<Item>* delete_ptr;
+            //delete_ptr = wmacnab_6::list_locate(front_ptr, count - 1);
+            //wmacnab_6::list_remove(delete_ptr);
+            //--count;
+            back_ptr = wmacnab_6::list_locate(front_ptr, count - 1);
+            wmacnab_6::list_remove(back_ptr, count - 1);
+            --count;
+        }
+        
+    }
+    template <typename Item>
+    void deque<Item>::operator =(const deque& source)
+    {
+        wmacnab_6::list_clear(front_ptr);
+        count = 0;
+        list_copy(source.front_ptr, front_ptr, back_ptr);
+        count = source.count;
+    }
+    // Constant methods
+    template <typename Item>
+    Item deque<Item>::front() const
+    {
+        if (empty()) return Item();
+        return front_ptr->data();
+    }
+    template <typename Item>
+    Item deque<Item>::back() const
+    {
+        if (empty()) return Item();
+        return back_ptr->data();
+    }
+    template <typename Item>
+    std::size_t deque<Item>::size() const
+    {
+        return count;
+    }
+    template <typename Item>
+    bool deque<Item>::empty() const
+    {
+        return (count == 0);
+    }
+}

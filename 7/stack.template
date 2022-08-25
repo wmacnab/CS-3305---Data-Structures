@@ -1,0 +1,69 @@
+/*
+FILE: stack.cpp
+CLASS IMPLEMENTED: stack
+NAMESPACE: wmacnab_7
+
+INVARIANT of the stack class:
+    1. The elements of the stack are stored in a linked list
+    pointed to by head_ptr, with the head node as the top of the stack
+*/
+
+namespace wmacnab_7
+{
+    // CONSTRUCTORS
+    template <typename Item>
+    stack<Item>::stack()
+    {
+        head_ptr = NULL;
+    }
+    template <typename Item>
+    stack<Item>::stack(const stack<Item>& source)
+    {
+        wmacnab_6::node<Item> tail_ptr;
+        wmacnab_6::list_copy(source.head_ptr, head_ptr, tail_ptr);
+    }
+    template <typename Item>
+    stack<Item>::~stack()
+    {
+        wmacnab_6::list_clear(head_ptr);
+    }
+    // MODIFICATION METHODS
+    template <typename Item>
+    void stack<Item>::operator =(const stack<Item>& source)
+    {
+        if (this == &source) return; // Handle self-assignment
+        wmacnab_6::list_clear(head_ptr);
+        wmacnab_6::node<Item>* tail_ptr;
+        wmacnab_6::list_copy(source.head_ptr, head_ptr, tail_ptr);
+    }
+    template <typename Item>
+    void stack<Item>::push(const Item& entry)
+    {
+        wmacnab_6::list_head_insert(head_ptr, entry);
+    }
+    template <typename Item>
+    Item stack<Item>::pop()
+    {
+        if (is_empty()) return Item();
+        Item data_top = head_ptr->data();
+        wmacnab_6::list_head_remove(head_ptr);
+        return data_top;
+    }
+    // CONSTANT METHODS
+    template <typename Item>
+    Item stack<Item>::top() const
+    {
+        if (is_empty()) return Item();
+        return (head_ptr->data());
+    }
+    template <typename Item>
+    bool stack<Item>::is_empty() const
+    {
+        return (head_ptr == NULL);
+    }
+    template <typename Item>
+    std::size_t stack<Item>::size() const
+    {
+        return list_length(head_ptr);
+    }
+}

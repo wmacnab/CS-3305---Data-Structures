@@ -1,0 +1,114 @@
+/*
+File: sequence.template
+Class: sequence
+Namespace: wmacnab_6_9
+Documentation for using the class is included in the header file "sequence.h"
+
+INVARIANT for the sequence class:
+1. double_link_node<Item> *head_ptr
+2. double_link_node<Item> *tail_ptr
+3. double_link_node_iterator<Item> *current
+*/
+namespace wmacnab_6_9
+{
+    // CONSTRUCTORS
+    template <typename Item>
+    sequence<Item>::sequence()
+    {
+        head_ptr = NULL;
+        start();
+    }
+    template <typename Item>
+    sequence<Item>::sequence(const sequence& source)
+    {
+        list_copy(source.head_ptr, head_ptr);
+        start();
+    }
+    template <typename Item>
+    sequence<Item>::~sequence()
+    {
+        list_clear(head_ptr);
+    }
+    // SEQUENCE FUNCTIONS
+    template <typename Item>
+    void sequence<Item>::start()
+    {
+        current_ptr = head_ptr;
+    }
+    template <typename Item>
+    void sequence<Item>::advance()
+    {
+        if (current_ptr == NULL || current_ptr->fore() == NULL) return;
+        current_ptr = current_ptr->fore();
+    }
+    template <typename Item>
+    void sequence<Item>::retreat()
+    {
+        if (current_ptr == NULL || current_ptr->back() == NULL) return;
+        current_ptr = current_ptr->back();
+    }
+    template <typename Item>
+    Item sequence<Item>::current() const
+    {
+        return current_ptr->data();
+    }
+    template <typename Item>
+    void sequence<Item>::insert(const Item& entry)
+    {
+        if (head_ptr == NULL || head_ptr == current_ptr)
+        {
+            list_head_insert(head_ptr, entry);
+            current_ptr = head_ptr;
+        }
+        else
+        {
+            list_insert(current_ptr->back(), entry);
+            //current_ptr = current_ptr->back();
+        }
+    }
+    template <typename Item>
+    void sequence<Item>::attach(const Item& entry)
+    {
+        if (head_ptr == NULL)
+        {
+            list_head_insert(head_ptr, entry);
+            current_ptr = head_ptr;
+        }
+        else
+        {
+            list_insert(current_ptr, entry);
+            current_ptr = current_ptr->fore();
+        }
+    }
+    template <typename Item>
+    void sequence<Item>::remove()
+    {
+        if (current_ptr != NULL) list_remove(current_ptr);
+    }
+    // ITERATOR FUNCTIONS
+    template <typename Item>
+    double_link_node_iterator<Item> sequence<Item>::begin() const
+    {
+        double_link_node_iterator<Item> p(head_ptr);
+        return p;
+    }
+    template <typename Item>
+    double_link_node_iterator<Item> sequence<Item>::end() const
+    {
+        double_link_node_iterator<Item> p;
+        return p;
+    }
+    /*template <typename Item>
+    const_double_link_node_iterator<Item> sequence<Item>::begin() const
+    {
+        const_double_link_node_iterator<Item>(head_ptr) p;
+        return p;
+
+    }
+    template <typename Item>
+    const_double_link_node_iterator<Item> sequence<Item>::end() const
+    {
+        const_double_link_node_iterator<Item> p;
+        return p;
+    }*/
+}

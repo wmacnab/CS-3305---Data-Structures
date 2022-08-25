@@ -1,0 +1,117 @@
+#include <cstdlib>
+#include <cctype>
+namespace wmacnab_6
+{
+    template <typename Item>
+    std::size_t list_length(const node<Item>* head_ptr)
+    {
+        unsigned int answer = 0;
+        const node<Item>* cursor;
+        for (cursor = head_ptr; cursor != NULL; cursor = cursor->link()) ++answer;
+        return answer;
+    }
+
+    template <typename Item>
+    void list_head_insert(node<Item>*& head_ptr, const Item& entry)
+    // Beautiful implementation of head_insert!
+    {
+        node<Item> *insert_ptr = new node<Item>(entry, head_ptr);
+        head_ptr = insert_ptr;
+        //head_ptr = new node(entry, head_ptr);
+    }
+    template <typename Item>
+    void list_insert(node<Item>* previous_ptr, const Item& entry)
+    {
+        node<Item> *insert_ptr = new node<Item>(entry, previous_ptr->link());
+        previous_ptr->set_link(insert_ptr);
+        // The following didn't work for some reason:
+        //previous_ptr = new node(entry, previous_ptr->link());
+    }
+    template <typename NodePtr, typename Item> // NodePtr may be node<Item>* or const node<Item>*
+    // This prevents the necessity for a const and a non-const function
+    NodePtr list_search(NodePtr head_ptr, const Item& target)
+    {
+        node<Item> *cursor;
+        for (cursor = head_ptr; cursor != NULL; cursor = cursor->link())
+        {
+            if (cursor->data() == target) return cursor;
+        }
+        return NULL;
+    }
+    template <typename NodePtr, typename SizeType>
+    NodePtr list_locate(NodePtr head_ptr, SizeType position)
+    {
+        SizeType i = 1;
+        NodePtr cursor;
+        for (cursor = head_ptr; cursor != NULL; ++i)
+        {
+            if (position == i) return cursor;
+            cursor = cursor->link();
+        }
+        return NULL;
+    }
+    template <typename Item>
+    void list_copy(const node<Item>* source_ptr, node<Item>*& head_ptr, node<Item>*& tail_ptr)
+    {
+        // The NULL condition
+        head_ptr = tail_ptr = NULL;
+        if (source_ptr == NULL) return;
+        // Copying the head to the new linked list
+        list_head_insert(head_ptr, source_ptr->data());
+        tail_ptr = head_ptr;
+        // Inserting new nodes and moving the tail pointer one by one
+        source_ptr = source_ptr->link();
+        while(source_ptr != NULL)
+        {
+            list_insert(tail_ptr, source_ptr->data());
+            tail_ptr = tail_ptr->link();
+            source_ptr = source_ptr->link();
+        }
+    }
+    template <typename Item>
+    void list_head_remove(node<Item>*& head_ptr)
+    {
+        node<Item> *remove_ptr = head_ptr;
+        head_ptr = head_ptr->link();
+        delete remove_ptr;
+    }
+    template <typename Item>
+    void list_remove(node<Item>* previous_ptr)
+    {
+        node<Item> *remove_ptr = previous_ptr->link();
+        previous_ptr->set_link(remove_ptr->link());
+        delete remove_ptr;
+    }
+    template <typename Item>
+    void list_clear(node<Item>*& head_ptr)
+    {
+        while (head_ptr != NULL) list_head_remove(head_ptr);
+    }
+    // DOUBLE CHECK THIS
+    template <typename Item>
+    void list_piece(const node<Item>* start_ptr, const node<Item>* end_ptr, node<Item>*& head_ptr,  node<Item>*& tail_ptr)
+    {
+        head_ptr = tail_ptr = NULL;
+        if (start_ptr == NULL) return;
+        list_head_insert(head_ptr, start_ptr->data());
+        tail_ptr = head_ptr;
+        start_ptr = start_ptr->link();
+        while (start_ptr != end_ptr)
+        {
+            list_insert(tail_ptr, start_ptr->data());
+            start_ptr = start_ptr->link();
+            tail_ptr = tail_ptr->link();
+        }
+    }
+    // DOUBLE CHECK THIS TOO
+    template <typename Item>
+    void list_print(const node<Item>* head_ptr)
+    {
+        if (head_ptr == NULL) return;
+        for (size_t i = 1; i <= list_length(head_ptr); ++i)
+        {
+            std::cout << list_locate(head_ptr, i)->data() << "\t";
+        }
+        std::cout << std::endl;
+    }
+}

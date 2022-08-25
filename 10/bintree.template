@@ -1,0 +1,86 @@
+// File: bintree.template
+// Namespace: wmacnab_10
+// Implemented: toolkit functions for the binary_tree_node class
+
+namespace wmacnab_10
+{
+    template <typename Item>
+    void tree_clear(binary_tree_node<Item>*& root_ptr)
+    {
+        binary_tree_node<Item>* child;
+        if (root_ptr != NULL)
+        {
+            child = root_ptr->left();
+            tree_clear(child);
+            child = root_ptr->right();
+            tree_clear(child);
+            delete root_ptr;
+            root_ptr = NULL;
+        }
+    }
+    template <typename Item>
+    binary_tree_node<Item>* tree_copy(const binary_tree_node<Item>* root_ptr)
+    {
+        binary_tree_node<Item> *l_ptr, *r_ptr;
+        if (root_ptr == NULL) return NULL;
+        else
+        {
+            l_ptr = tree_copy(root_ptr->left());
+            r_ptr = tree_copy(root_ptr->right());
+            return new binary_tree_node<Item>(root_ptr->data(), l_ptr, r_ptr);
+        }
+    }
+    template <typename Item>
+    typename binary_tree_node<Item>::size_type tree_size(const binary_tree_node<Item>* root_ptr)
+    {
+        if (root_ptr == NULL) return 0;
+        else return (1 + tree_size(root_ptr->left()) + tree_size(root_ptr->right()));
+    }
+    template <typename Item>
+    typename binary_tree_node<Item>::size_type tree_depth(const binary_tree_node<Item>* root_ptr)
+    {
+        if (root_ptr == NULL) return -1;
+        typename binary_tree_node<Item>::size_type left = 1 + tree_depth(root_ptr->left()), right = 1 + tree_depth(root_ptr->right());
+        return (left > right) ? left : right;
+    }
+    template <typename Item>
+    void tree_print(const binary_tree_node<Item>* node_ptr, typename binary_tree_node<Item>::size_type depth)
+    {
+        std::cout << std::setw(4 * depth) << ""; // Indentation
+        if (node_ptr == NULL) std::cout << "[Empty]" << std::endl; // Fallen off the tree
+        else if (node_ptr->is_leaf()) // A leaf
+        {
+            std::cout << node_ptr->data() << " [Leaf]" << std::endl;
+        }
+        else // A nonleaf
+        {
+            std::cout << node_ptr->data() << std::endl;
+            tree_print(node_ptr->right(), depth + 1);
+            tree_print(node_ptr->left(), depth + 1);
+        }
+    }
+    template <typename Process, typename BTNode>
+    void tree_preorder(Process f, BTNode* node_ptr)
+    {
+        if (node_ptr == NULL) return;
+        f(node_ptr->data());
+        tree_preorder(f, node_ptr->left());
+        tree_preorder(f, node_ptr->right());
+    }
+    template <typename Process, typename BTNode>
+    void tree_inorder(Process f, BTNode* node_ptr)
+    {
+        if (node_ptr == NULL) return;
+        tree_inorder(f, node_ptr->left());
+        f(node_ptr->data());
+        tree_inorder(f, node_ptr->right());
+    }
+    template <typename Process, typename BTNode>
+    void tree_postorder(Process f, BTNode* node_ptr)
+    {
+        if (node_ptr == NULL) return;
+        tree_postorder(f, node_ptr->left());
+        tree_postorder(f, node_ptr->right());
+        f(node_ptr->data());
+    }
+}
