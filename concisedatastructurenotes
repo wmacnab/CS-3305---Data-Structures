@@ -1,0 +1,177 @@
+// Concise DS notes:
+
+// Header Documentation:
+// Precondition & postcondition
+// VALUE SEMANTICS (assignment operator and copy constructor)
+// DYNAMIC MEMORY (what can throw bad_alloc?)
+
+// Implementation Documentation:
+// Note documentation is available in the header file
+// INVARIANT (implicit pre/post conditions for private members)
+
+// CONST keyword:
+// 1. const variables cannot change throughout the program
+// 2. const after a method may examine but not change the object
+// 3. const ref parameters require correct use of const keyword for methods. Use Whenever a function does not alter the object as a parameter, use a const reference parameter. You should NOT use const unless you use it properly at every location
+// 4. static member consants: two keywords static and const before its declaration in a class (static const size_type CAPACITY = 30;). Must be redeclared in the implementation file without the keyword static. The actual value is only given in the header. For non-integer types this is the other way round, but we do it this way with integer types because they are often used in the class definition to define something such as an array size
+// 5. const iterators: an iterator that is forbidden from changing its underlying container in any way.
+// 6. const parameters that are pointers or arrays: they may examine the item that is pointed to (or the array), but changing the item (or array) is forbidden. To prevent changing where a pointer points to, use this: node *const c = &first;
+// 7. const keyword with a pointer to a node and the need for two versions of some member functions: a node's const member functions should never provide a result that could later be used to change any part of the linked list (this increases reliability). A node that a constant pointer points to could be changed by another ordinary pointer that points to the same node. To enforce the const rule the C++ compiler permits a constant pointer to activate only constant methods. A node's const methods should never provide a result that could later be used to change any part of the underlying container. However const nodes can only activate const methods, so we must provide both. The compiler automatically converts return link; to a const node if activated by a const pointer. This ensures that it can't be changed later.
+
+// INLINE functions:
+// 1. You don't have to write the implementation later
+// 2. Each time the inline function is used in your program, the compiler will recompile the short function definition and place a copy of this compiled short definition in your code. This saves some execution time (there is no actual function call and function return), but it may be inefficient in space (you end up with many copies of the same compiled code).
+// "We recommend using an inline method only for the simple situation when the function definition consists of a single short statement."
+
+// FRIEND functions:
+// a function that is not a method but still has access to the private members of the objects of a class. Frindship should be limited to functions that are written by the programmer who implements the class.
+// "when you are implementing a class, you often implement additional functions to manipulate objects of the class. If a function needs access to private members of the class, then you should first consider providing the access via a method. However, if a method is inconvenient or unacceptable for other reasons, then you may grant friendship to a function, giving it access to the class's private members.
+
+// When an array has a component type that is a class, the compiler usees the default constructor to initalize the array components
+
+// THE INVARIANT OF A CLASS:
+// The rules that dictate how the member variables of a class represent a value (such as a bag of items). The knowledge of these rules is essential to the correct implementation of the class's functions. With the exception of the constructors, each function depends on the invariant being valid when the function is called, and each function, including the constructors, has a responsibility of ensuring that the invariant is valid when the function finished. In some sense, the invariant of a class is a condition that is an implicit part of every function's postcondition and (except for the constructors) is an implicit part of every function's precondition. The invariant is a critical part of the implementation of a class, but it has no effect on the way the class is used.
+// The Invariant of a Class: Always make an explicit statement of the rules that dictate how the member variables of a class are used. These rules are called the invariant of the class. All of the functions (except the constructors) can count on the invariant being valid when the function is called. Each function also has the responsibility of ensuring that the invariant is valid when the function finishes.
+// Do not write the invariant in the header file, because a programmer who uses the class does not need to know about how the invariant dictates the use of private fields. But the programmer who implements the class does need to know about the invariant.
+
+// STL MULTISET MEMBERS:
+// a typedef for value_type
+// a typedef for size_type
+// size_type count(const value_type& target) const;
+// size_type erase(const value_type& target);
+// size_type size() const;
+// iterator insert(const value_type& entry);
+// iterator find(const value_type& target);
+// void erase(iterator i);
+// You can use find() and erase() together to search and destroy a particular element value
+// [...) left-inclusive pattern
+
+// new operator creates a new dynamic variable of the type double and returns a pointer to this new dynamic variable
+// if the dynamic variable is an object of a class, the default constructor will be called to initialize the new class instance. A different constructor will be called if you place the constructor's arguments after the type name in the new statement.
+t_ptr = new throttle(50);
+// The new operator can also allocate a dynamic array of components, returning a pointer to the first element, with array size specified in square brackets after the data type of the components. The default constructor will always be used to initialize all components. There is no mechanism to use a different constructor on the array components.
+// When new allocates a dynamic variable/array, the memory comes from a location called the program's heap (also called the free store).
+// Some computers provide huge heaps, but can still run out by allocating too many dynamic variables. When the heap runs out of room, the new operator fails. bad_alloc exception
+// new(nothrow) can have a nullptr returned instead of error (<new>)
+// For us, the normal failure (error msg and halting) will be sufficient
+// If your program no longer needs a dynamic variable, the memory used by that dynamic variable can be returned to the heap where it can be reused for more dynamic variables. In C++, the delete operator is used to return the memory of a dynamic variable back to the heap. The delete operator is called by writing the word delete, followed by the pointer variable.
+// Using the delete operation is called "freeing" or "releasing" memory
+// Used differently with arrays: delete [] arr;
+
+// TIP:
+typedef int* int_pointer;
+
+// Pointers and arrays as parameters with the const keyword:
+// The function cannot change what is being pointed to
+
+// Reference parameters that are pointers:
+// when a function wants to actually change a pointer parameter so that the pointer points to a new location, and the programmer needs the change to affect the actual argument. (this is the only situation where a reference parameter will be a pointer)
+
+// this: can be used inside any method to provide a pointer to the object that activated the method
+
+// When a class uses dynamic memory, you will generally follow these four rules:
+// 1. Some of the member variables of the class are pointers
+// 2. Member functions allocate and release dynamic memory as needed
+// 3. The automatic value semantics of the class is overridden (otherwise two different objects end up with pointers to the same dynamic memory). This means that the implementor must write an assignment operator and a copy constructor for the class.
+// 4. The class has a destructor. The primary purpose of the destructor is to return all dynamic memory to the heap.
+
+// Dynamic memory requirements:
+// A destructor, a copy constructor, and an overloaded assignment operator
+
+// ptr->m means the same as (*p).m
+
+// This can never point to something else:
+node *const c = &first;
+// This cannot change the node being pointed to:
+const node *c = &first;
+
+// const pointers can only -> constant methods
+
+// The ability to handle an empty list is one of the reasons why list manipulation functions are generally not node methods (since the empty list has no nodes)
+// Never call DELETE unless you are actually reducing the number of nodes
+// Never call NEW unless you are actually increasing the number of nodes
+
+// When to provide two versions for a function:
+// When a nonmember function has a parameter that is a pointer to a node, and the return value is also a pointer to a node, you should often have two versions: one version where the parameter and return value are both node*, and a second version where the parameter and return values are both const node*
+
+// Before calling a function that allocates dynamic memory, make sure the invariant of your class is valid
+
+// How to choose between approaches:
+// Normally, when two approaches have equal efficiency, we will choose the approach that makes the best use of the toolkit. This saves us work and also reduces the chance of new errors from writing new code to do an old job.
+
+// Dynamic arrays vs linked lists vs doubly linked list
+// A | Dynamic Array: Frequent random access operations
+// B | Linked List: Operations occur at a cursor
+// C | Doubly Linked List: Operations occur at a two-way cursor
+// D | A linked list avoids resizing inefficiency: Frequent resizing may be needed
+
+// STL VECTORS VS. STL LISTS VS. STL DEQUES (pronounced "decks")
+
+// A | Vector: dynamic array, indexing
+// B | List: doubly linked list, push/pop
+// C | Deque: "third mechanism from chapter 8"
+
+vector<T>() and list<T>() and deque<T>()
+// They use value_type specified in <>, ex list<string>& data
+// They use size_type, typically an unsigned int
+void clear()
+void push_back(const value_type& entry) // RHS, size of container +1
+void pop_back() // RHS entry removed
+// The following two are for lists and deques only:
+void push_front(const value_type& entry)
+void pop_front()
+// The following is only for the vector, allowing the programmer to control efficiency:
+void reserve(size_type amount)
+// The following changes the # of elements in the container to the specified amount. If this new size is smaller than the current size, then removed elements are taken from the right end, if the new size is larger, then new elements have the value of the entry parameter, if the entry is omitted, then new elements are initalized by the default constructor of the value_type
+void resize(size_type amount, const value_type& entry)
+// ACCESSING ELEMENTS DIRECTLY from the back and front
+cout << v.back()
+v.front() = 42;
+
+// ITERATOR FUNCTIONS for these classes:
+iterator begin() // returns an interator to first elem. of collection
+iterator end() // returns an iterator to the first elem beyond end
+iterator rbegin() // returns reverse iterator to last elem of cllctn
+iterator rend() // returns iterator to first elem before cllctn start
+// ONCE YOU HAVE AN ITERATOR, YOU MAY PERFORM VARIOUS ACTIONS AT THAT LOCATION:
+iterator erase(iterator it) // elem at it has been removed
+iterator erase(iterator it1, iterator it2) // all elem from it1 to it2
+iterator insert(iterator it, const value_type& entry) // after it
+// VALUE SEMANTICS: Assignments and the copy constructor may be used with these objects
+
+// Professional programmers try to write functions and classes that have general applicability in many settings.
+// Certainly our bag, sequence, and node class are fairly generic. However a program cannot easily use both a bag of strings and a bag of integers.
+// Templates: an approach to writing code that is meant to be reused in a variety of settings
+// Iterators: They allow programmers to step through all the items of a container in a standard manner
+
+// Tip: Capitalize the name of a template parameter
+
+// The compiled doesn't actually compile anything when it sees the implementation of the template function. It is only when the function is instantiated by using it in the main program (or elsewhere) that the compiler takes action to compile a certain version of the template function, using the specified type for the template parameter. Ex: using int and string, the one implementation is instantiated in two different ways
+// Unification: the compiler's term for determining how to instantiate a template function
+// RULE: The template parameter must appear in the parameter list of the template function. Otherwise, the compiler cannot figure out how to instantiate the template function when it is used.
+// RULE: The compiler does not convert arguments for a template function. The arguments must have an EXACT match, with no type conversions. Even with const.
+
+// SUMMARY TO CONVERT A CONTAINER CLASS TO A TEMPLATE:
+// 1. The template prefix precedes each function prototype or implementation
+// 2. Outside the class definition, place the word <Item> with the class name, such as bag<Item>
+// 3. Use the name Item instead of value_type
+// 4. Outside of member functions and the class definition itself, add the keyword typename before any use of one of the class's type names. For example: typename bag<Item>::size_type
+// 5. The implementation file now ends with .template and is included in the header by an include directive
+// 6. Eliminate any using directives in the implemenetation file. Therefore, we must then write std:: in front of any Standard Library function such as std::copy
+// 7. Some compilers require any default argument to be in both the prototype and the function implementation
+
+// For methods, you don't NEED a template parameter for each of the function's parameters
+
+// C++ Standard specifies 5 significant categories of iterators based on their abilities with each more powerful
+// 1. Output iterator
+// 2. Input iterator
+// 3. Forward iterator
+// 4. Bidirectional iterator
+// 5. Random access iterator
+
+// HOW TO PROVIDE AN ITERATOR FOR A CONTAINER CLASS THAT YOU WRITE:
+// YOU  MUST GENERALLY PROVIDE THESE ITEMS IN THE PUBLIC SECTION OF THE CLASS DEFINITION:
+// 1. There is a definition for a small class, usually called iterator. Has a few methods such as the * operator and ++, which all iterators must have. In the case of the multiset, the iterator will be defined as a node_iterator from section 6.5
+// 2. The container also needs a definition for a second small class, usually called const_iterator. Same as ordinary iterator except its member functions must not change the container in any way. Our bag will use a const_nod_iterator for its const_iterator.
+// 3. The container needs a begin() method which creates and returns an iterator that refers to the container's first item. For the multiset, this iterator will be positioned at the head element of the linked list. Actually, we'll need two versions of the begin function: an ordinary version and a constant version that return iterator and const_iterator respectively.
+// 4. Needs two end methods (one constant) which return an iterator (or const_iterator) indicating a position that is beyond the end of the container.
